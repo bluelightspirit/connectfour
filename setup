@@ -1,9 +1,0 @@
-on google cloud VM I run these, >>> means you have to run every time you start up the terminal from your current directory that has kivy_venv file. if u dont have that file u do the command before that:
-
-https://kivy.org/doc/stable/gettingstarted/installation.html
-sudo apt update
-sudo apt install python3.11-venv
-python3 -m venv kivy_venv
->>> source kivy_venv/bin/activate
-python -m pip install --upgrade pip setuptools virtualenv
-python -m pip install "kivy[base]" kivy_examples
