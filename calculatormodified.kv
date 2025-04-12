@@ -16,31 +16,6 @@
   background_disabled_normal: 'light_red.png'
   markup: True
 
-<ColorChooserButton@Button>:
-  markup: True
-
-<ColorChooserLayout@BoxLayout>:
-  orientation: 'vertical'
-  Label:
-    text: 'What color do you want?'
-    size_hint_y: .25
-  GridLayout:
-    rows: 2
-    ColorChooserButton:
-      background_color: (255/88, 200/88, 0/88, 1)
-      text: '[color=FFFFE0]Yellow[/color]'
-      on_release:
-        app.color = 'yellow'
-        print(app.color)
-        app.build()
-    ColorChooserButton:
-      background_color: (144/98, 93/98, 93/98, 1)
-      text: '[color=F4C2C2]Red[/color]'
-      on_release:
-        app.color = 'red'
-        print(app.color)
-        app.buildConnectFour()
-
 <ConnectFourBoxLayout@BoxLayout>:
   orientation: 'vertical'
 
