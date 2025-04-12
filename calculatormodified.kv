@@ -1,0 +1,90 @@
+<Red@Image>:
+  source: 'red.png'
+  fit_mode: 'scale-down'
+  size_hint: [1, 1/6]
+
+<Yellow@Image>
+  source: 'yellow.png'
+  fit_mode: 'scale-down'
+  size_hint: [1, 1/6]
+
+<EmptyStackLayout@StackLayout>:
+  orientation: 'bt-lr'
+
+<ColumnButton@Button>:
+  background_color: (144/88,238/88,144/88,1)
+  background_disabled_normal: 'light_red.png'
+  markup: True
+
+<ConnectFourBoxLayout@BoxLayout>:
+  orientation: 'vertical'
+
+  GridLayout:
+    cols: 7
+    EmptyStackLayout:
+      id: one
+    EmptyStackLayout:
+      id: two
+    EmptyStackLayout:
+      id: three
+    EmptyStackLayout:
+      id: four
+    EmptyStackLayout:
+      id: five
+    EmptyStackLayout:
+      id: six
+    EmptyStackLayout:
+      id: seven
+
+  GridLayout:
+    cols: 7
+    size_hint_y: .25
+    ColumnButton:
+      text: '[color=000000]Column 1[/color]'
+      on_release: 
+        if app.color == 'red':\
+        one.add_color('red')
+        elif app.color == 'yellow':\
+        one.add_color('yellow')
+    ColumnButton:
+      text: '[color=000000]Column 2[/color]'
+      on_release: 
+        if app.color == 'red':\
+        two.add_color('red')
+        elif app.color == 'yellow':\
+        two.add_color('yellow')
+    ColumnButton:
+      text: '[color=000000]Column 3[/color]'
+      on_release: 
+        if app.color == 'red':\
+        three.add_color('red')
+        elif app.color == 'yellow':\
+        three.add_color('yellow')
+    ColumnButton:
+      text: '[color=000000]Column 4[/color]'
+      on_release: 
+        if app.color == 'red':\
+        four.add_color('red')
+        elif app.color == 'yellow':\
+        four.add_color('yellow')
+    ColumnButton:
+      text: '[color=000000]Column 5[/color]'
+      on_release: 
+        if app.color == 'red':\
+        five.add_color('red')
+        elif app.color == 'yellow':\
+        five.add_color('yellow')
+    ColumnButton:
+      text: '[color=000000]Column 6[/color]'
+      on_release: 
+        if app.color == 'red':\
+        six.add_color('red')
+        elif app.color == 'yellow':\
+        six.add_color('yellow')
+    ColumnButton:
+      text: '[color=000000]Column 7[/color]'
+      on_release: 
+        if app.color == 'red':\
+        seven.add_color('red')
+        elif app.color == 'yellow':\
+        seven.add_color('yellow')
