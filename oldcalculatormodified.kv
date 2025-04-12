@@ -1,0 +1,53 @@
+<Red@Image>:
+  source: 'red.png'
+  fit_mode: 'scale-down'
+  size_hint: [1, 1/6]
+
+<Yellow@Image>
+  source: 'yellow.png'
+  fit_mode: 'scale-down'
+  size_hint: [1, 1/6]
+
+<EmptyStackLayout@StackLayout>:
+  orientation: 'bt-lr'
+  Red:
+
+<PieceGridLayout@GridLayout>:
+  cols: 7
+  EmptyStackLayout:
+    id: one
+  EmptyStackLayout:
+    id: two
+  EmptyStackLayout:
+    id: three
+  EmptyStackLayout:
+    id: four
+  EmptyStackLayout:
+    id: five
+  EmptyStackLayout:
+    id: six
+  EmptyStackLayout:
+    id: seven
+
+<Button>:
+  background_color: (144/88,238/88,144/88,1)
+  markup: True
+  on_press: self.add_red()
+
+<ButtonGridLayout@GridLayout>:
+  cols: 7
+  size_hint_y: .25
+  Button:
+    text: '[color=000000]Column 1[/color]'
+  Button:
+    text: '[color=000000]Column 2[/color]'
+  Button:
+    text: '[color=000000]Column 3[/color]'
+  Button:
+    text: '[color=000000]Column 4[/color]'
+  Button:
+    text: '[color=000000]Column 5[/color]'
+  Button:
+    text: '[color=000000]Column 6[/color]'
+  Button:
+    text: '[color=000000]Column 7[/color]'
