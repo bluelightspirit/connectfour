@@ -41,6 +41,7 @@ class TwistedServerApp(App):
             msg = "Pong"
         if msg == "plop":
             msg = "Kivy Rocks!!!"
+        msg = ' y'
         self.label.text += "responded: {}\n".format(msg)
         return msg.encode('utf-8')
 
