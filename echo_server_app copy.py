@@ -32,6 +32,19 @@ class EchoClientFactory(protocol.ClientFactory):
     def clientConnectionFailed(self, connector, reason):
         self.app.print_message('Connection failed.')
 
+class EchoServer(protocol.Protocol):
+    def dataReceived(self, data):
+        response = self.factory.app.handle_message(data)
+        if response:
+            self.transport.write(response)
+
+
+class EchoServerFactory(protocol.Factory):
+    protocol = EchoServer
+
+    def __init__(self, app):
+        self.app = app
+
 
 from kivy.app import App
 from kivy.uix.label import Label
@@ -50,7 +63,20 @@ class TwistedClientApp(App):
     def build(self):
         root = self.setup_gui()
         self.connect_to_server()
+        reactor.listenTCP(8000, EchoServerFactory(self))
         return root
+    
+    def handle_message(self, msg):
+        msg = msg.decode('utf-8')
+        self.label.text = "received:  {}\n".format(msg)
+                                                                                                                                                           
+        if msg == "ping":
+            msg = "Pong"
+        if msg == "plop":
+            msg = "Kivy Rocks!!!"
+        msg += ' TEST FROM SERVER'
+        self.label.text += "responded: {}\n".format(msg)
+        return msg.encode('utf-8')
 
     def setup_gui(self):
         self.textbox = TextInput(size_hint_y=.1, multiline=False)
@@ -75,7 +101,7 @@ class TwistedClientApp(App):
             self.textbox.text = ""
 
     def print_message(self, msg):
-        self.label.text += "Received: {}\n".format(msg)
+        self.label.text += "{}\n".format(msg)
 
 
 if __name__ == '__main__':
