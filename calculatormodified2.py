@@ -22,7 +22,6 @@ from kivy.uix.textinput import TextInput
 from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
 from kivy.lang import Builder
-
 kvfile = Builder.load_file('./calculatormodified2.kv')
 
 class PieceGridLayout(GridLayout):
@@ -136,7 +135,7 @@ class EchoClientFactory(protocol.ClientFactory):
         self.app.print_message('Connection failed. Retrying...')
         self.app.connect_to_server()
  
-class CalculatormodifiedApp2(App):
+class Calculatormodified2App(App):
     color = 'red' # color switcher option is too complex to make, also not even in extra credit list anyway
     connection = None
     label = None
@@ -339,6 +338,13 @@ class CalculatormodifiedApp2(App):
             self.connection.write(msg.encode('utf-8'))
             self.textbox.text = ""
 
+    def send_disconnect_message(self):
+        global id
+        msg = f"rdc|{id}\n"
+        if msg and self.connection:
+            self.connection.write(msg.encode('utf-8'))
+            self.textbox.text = ""
+
     def print_message(self, msg):
         self.label.text += "{}\n".format(msg)
 
@@ -354,6 +360,7 @@ class CalculatormodifiedApp2(App):
             if int(msg[2:]) == id:
                 result = "tie"
                 result_found = True
+                self.send_disconnect_message()
                 self.connector.disconnect()
                 self.disable_all_buttons()
                 print(result)
@@ -365,6 +372,7 @@ class CalculatormodifiedApp2(App):
                 result = "win"
                 result_found = True
                 self.client_win = True
+                self.send_disconnect_message()
                 self.connector.disconnect()
                 self.disable_all_buttons()
                 print(result)
@@ -376,6 +384,7 @@ class CalculatormodifiedApp2(App):
                 result = "lose"
                 result_found = True
                 self.server_win = True
+                self.send_disconnect_message()
                 self.connector.disconnect()
                 self.disable_all_buttons()
                 print(result)
@@ -401,6 +410,7 @@ class CalculatormodifiedApp2(App):
         if msg[0:1] == "t" and int(msg[8:]) == id:
             result = "tie"
             result_found = True
+            self.send_disconnect_message()
             self.connector.disconnect()
             self.disable_all_buttons()
             print(result)
@@ -409,6 +419,7 @@ class CalculatormodifiedApp2(App):
             result = "win"
             result_found = True
             self.client_win = True
+            self.send_disconnect_message()
             self.connector.disconnect()
             self.disable_all_buttons()
             print(result)
@@ -417,6 +428,7 @@ class CalculatormodifiedApp2(App):
             result = "lose"
             result_found = True
             self.server_win = True
+            self.send_disconnect_message()
             self.connector.disconnect()
             self.disable_all_buttons()
             print(result)
@@ -426,4 +438,4 @@ class CalculatormodifiedApp2(App):
 
  
 if __name__=='__main__':
-    CalculatormodifiedApp2().run()
+    Calculatormodified2App().run()
