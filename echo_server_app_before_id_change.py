@@ -25,11 +25,12 @@ class EchoServerFactory(protocol.Factory):
 from kivy.app import App
 from kivy.uix.label import Label
 
-class BoardToClient:
-    def __init__(self, id=-1):
-        self.id = id
-        # 2d by columns
-        self.connect_four_board= [
+
+class TwistedServerApp(App):
+    label = None
+    cols_enabled= [1,2,3,4,5,6,7]
+    # 2d by columns
+    connect_four_board= [
         ['','','','','',''], #col1
         ['','','','','',''], #col2
         ['','','','','',''], #col3
@@ -38,24 +39,6 @@ class BoardToClient:
         ['','','','','',''], #col6
         ['','','','','','']  #col7
         ]
-        self.cols_enabled= [1,2,3,4,5,6,7]
-        # TODO maybe do self.connect_four_board and cols_enabled so no reset needed
-    def show_id(self):
-        print(self.id)
-    # cols_enabled= [1,2,3,4,5,6,7]
-    
-    
-    # def reset_variables(self):
-    #     self.connect_four_board= [
-    #     ['','','','','',''], #col1
-    #     ['','','','','',''], #col2
-    #     ['','','','','',''], #col3
-    #     ['','','','','',''], #col4
-    #     ['','','','','',''], #col5
-    #     ['','','','','',''], #col6
-    #     ['','','','','','']  #col7
-    #     ]
-    #     cols_enabled= [1,2,3,4,5,6,7]
     
     def insert_to_board(self, columnNumber, color):
         for x in range(len(self.connect_four_board[columnNumber-1])):
@@ -67,6 +50,11 @@ class BoardToClient:
                 # print('-----')
                 break
 
+    def build(self):
+        self.label = Label(text="server started\n")
+        reactor.listenTCP(8000, EchoServerFactory(self))
+        return self.label
+    
     def choose_column(self):
         if len(self.cols_enabled) == 0:
             return 0
@@ -78,7 +66,7 @@ class BoardToClient:
             return True
         else:
             return False
-    
+        
     # check cols starts at col 1 row 1, then searches col 2 row 1, col 3 row 1, and col 4 row 1
     # have col be limited by 6-3 because beyond col 7 does not exist, and you add up to 3 for col
     def check_matching_columns(self):
@@ -127,7 +115,7 @@ class BoardToClient:
                 return winner_result
         return ''
     
-    def construct_message(self, msg, color, id):
+    def construct_message(self, msg, color):
         col = self.choose_column()
         self.insert_to_board(col, color)
         #print('tie result: ' + str(tie))
@@ -142,115 +130,41 @@ class BoardToClient:
         elif self.determine_winner() == color:
             print('winner: ' + self.determine_winner())
             res= 'l'
-        return f"{res}|yel|{col}|{id}"
-    
-
-class TwistedServerApp(App):
-    label = None
-    boards = []
-
-
-    def build(self):
-        self.label = Label(text="server started\n")
-        reactor.listenTCP(8000, EchoServerFactory(self))
-        return self.label
+        return f"{res}|yel|{col}"
     
 
     def handle_message(self, msg):
+        color = ''
         msg = msg.decode('utf-8')
         self.label.text = "received:  {}\n".format(msg)
         msg_array = msg.split("\n")
         msg = ''
-        id = None
         for x in msg_array:
+            # case of receiving dis (handle this before trying to add colors for less problems)
             if x == '':
                 pass
-            elif x[0:2] == 'id':
-                id = x[3:]
-                return self.handle_message_before_id_setup(id)
-            elif x != '':
-                print('MSG: ' + x)
-                return self.handle_message_after_id_setup(x)
-        
-    def find_board(self, id):
-        for board in self.boards:
-            if board.id == id:
-                return board
-        return None
-    
-    def remove_board(self, id):
-        board = self.find_board(id)
-        if board == None:
-            return None
-        else:
-            self.boards.remove(board)
-
-    def handle_message_before_id_setup(self, id):
-        board = self.find_board(int(id))
-        if board != None:
-            msg = 'id_inv: ' + id
-            self.label.text += "responded: {}\n".format(msg)
-            return msg.encode('utf-8')
-        else: 
-            id = int(id)
-            new_board = BoardToClient(id)
-            # for some reason this is needed
-            # new_board.reset_variables()
-            self.boards.append(new_board)
-            #print(self.boards)
-            print(self.find_board(id))
-            msg = "id_val: " + str(id)
-            self.label.text += "responded: {}\n".format(msg)
-            return msg.encode('utf-8')
-
-    def handle_message_after_id_setup(self,msg):
-        color = ''
-        print(msg)
-        self.label.text = "received:  {}\n".format(msg)
-        msg_array = msg.split("\n")
-        msg = ''
-        for x in msg_array:
-            print('> msg: ' + x + " <")
-            # case of receiving dis (handle this before trying to add colors for less problems)
-            # if x == '':
-            #     pass
-            if x[0:3] == 'dis':
-                print('reach???')
-                idGivenStr = x[6:7]
-                idGiven = int(idGivenStr)
-                boardGiven = self.find_board(idGiven)
-                boardGiven.cols_enabled.remove(int(x[4:5]))
-                print('cols enabled: ' + str(boardGiven.cols_enabled))
+            elif x[0:3] == 'dis':
+                self.cols_enabled.remove(int(x[4:5]))
+                print('cols enabled: ' + str(self.cols_enabled))
                 #print("receive dis successful")
         for x in msg_array:
             # case of receiving a color
             if x == '':
                 pass
-            elif x[0:3] != 'dis' and x[0:3] != 'rdc':
+            elif x[0:3] != 'dis':
                 # get color and insert to board
                 color = x[0:3]
                 colToInsertStr = x[4:5]
                 colToInsert = int(colToInsertStr)
-                idGivenStr = x[6:7]
-                print(idGivenStr)
-                idGiven = int(idGivenStr)
-                print(self.boards)
-                boardGiven = self.find_board(idGiven)
-                print(boardGiven)
-                print(type(boardGiven))
-                print(boardGiven.id)
-                boardGiven.insert_to_board(colToInsert,color)
-                print(boardGiven.connect_four_board)
-                if boardGiven.determine_winner() == color:
-                    print('winner: ' + boardGiven.determine_winner())
-                    msg = f'w|{idGivenStr}'
+                self.insert_to_board(colToInsert,color)
+                if self.determine_winner() == color:
+                    print('winner: ' + self.determine_winner())
+                    msg = 'w'
                     break
-                elif boardGiven.determine_winner() != color and boardGiven.determine_winner() != '':
-                    print('winner: ' + boardGiven.determine_winner())
-                    msg = f'l|{idGivenStr}'
+                elif self.determine_winner() != color and self.determine_winner() != '':
+                    print('winner: ' + self.determine_winner())
+                    msg = 'l'
                     break
-                elif boardGiven.determine_tie() == True:
-                    msg = f't|{idGivenStr}'
 
                 #print("receive color succsesful")
                 # switch colors to send
@@ -258,16 +172,10 @@ class TwistedServerApp(App):
                     color = 'red'
                 else:
                     color = 'yel'
-                msg = boardGiven.construct_message(msg, color, idGiven)
-                print('connect 4 board: ' + str(boardGiven.connect_four_board))
+                msg = self.construct_message(msg, color)
+                print('connect 4 board: ' + str(self.connect_four_board))
                 self.label.text += "responded: {}\n".format(msg)
                 return msg.encode('utf-8')
-            elif x[0:3] == 'rdc':
-                idGivenStr = x[4:5]
-                idGiven = int(idGivenStr)
-                self.remove_board(idGiven)
-                self.label.text += f"removed board id {idGivenStr} from boards\n"
-
         # msg options to send back
         # msg = "w|non|0"
         # msg = "l|non|0"
@@ -277,6 +185,8 @@ class TwistedServerApp(App):
         
         # case of sole disable, just send empty string over
         # except if there is a tie
+        if self.determine_tie() == True:
+            msg = 't'
         return msg.encode('utf-8')
 
 
