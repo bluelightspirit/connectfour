@@ -113,8 +113,9 @@ class EchoClientFactory(protocol.ClientFactory):
     def clientConnectionLost(self, connector, reason):
         global result_found
         if result_found == False:
-            self.app.widget.clear_widgets()
-            self.app.label = Label(text='Lost connection. \nRetrying to connect...\n')
+            #self.app.widget.clear_widgets()
+            self.app.label = Label(text='[ref=myref]Lost connection. \nRetrying to connect...\n[/ref]',markup=True)
+            Clock.schedule_once(lambda dt: self.app.show_marks(self.app.label), 0.1)
             self.app.widget.add_widget(self.app.label)
             self.app.connect_to_server()
         else:
@@ -242,9 +243,13 @@ class CalculatormodifiedApp(App):
         self.connector = reactor.connectTCP('localhost', 8000, EchoClientFactory(self))
 
     def on_connection(self, connection):
-        self.print_message("Connected successfully! Negotiating id with server...")
         self.connection = connection
-        self.send_message_to_receive_id()
+        global id_found
+        if id_found == False:
+            self.print_message("Connected successfully! Negotiating id with server...")
+            self.send_message_to_receive_id()
+        else:
+            self.widget.remove_widget(self.label)
 
     def setup_new_gui(self):
         self.widget.clear_widgets()
