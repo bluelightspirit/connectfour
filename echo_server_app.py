@@ -39,6 +39,7 @@ class BoardToClient:
         ['','','','','','']  #col7
         ]
         self.cols_enabled= [1,2,3,4,5,6,7]
+        self.good_columns= []
         # TODO maybe do self.connect_four_board and cols_enabled so no reset needed
     def show_id(self):
         print(self.id)
@@ -70,6 +71,7 @@ class BoardToClient:
     def choose_column(self):
         if len(self.cols_enabled) == 0:
             return 0
+        print('current cols enabled: ' + str(self.cols_enabled))
         return random.choice(self.cols_enabled) 
     
     def determine_tie(self):
@@ -78,10 +80,151 @@ class BoardToClient:
             return True
         else:
             return False
+        
+    # search if a column is enabled or not
+    def search_if_col_is_enabled(self, columnNumber):
+        try:
+            index = self.cols_enabled.index(columnNumber+1)
+            print('col number ' + str(columnNumber+1) + ' aimed')
+        except ValueError:
+            return False
+        return True
+        
+    # ai check for almost matching rows (3 in a row)
+    def ai_check_almost_matching_rows(self):
+        board = self.connect_four_board
+        # store good columns to choose from. keep duplicates as increasing odds of choosing a column in the end is intended
+        goodColumns = self.good_columns
+        for col in range(4):
+            for row in range(6):
+                # this can be aggressive or defensive since it's seraching for non-empty string.
+                if board[col][row] != '' and board[col+1][row] == board[col][row] and board[col+2][row] == board[col][row]:
+                    # check for empty good spots in columns
+                    # check for empty column left
+                    if col-1 >= 0:
+                        if board[col-1][row] == '':
+                            # special checking if there's a piece under the good spot to place
+                            if row-1 >= 0:
+                                if board[col-1][row-1] != '':        
+                                    goodColumns.append(col-1)
+                            # if row-1 is negative then the column spot in question is at the bottom and it's available
+                            else:
+                                goodColumns.append(col-1)
+                    # check for empty column right
+                    if board[col+3][row] == '':
+                        # special checking if there's a piece under the good spot to place
+                            if row-1 >= 0:
+                                if board[col+3][row-1] != '':        
+                                    goodColumns.append(col+3)
+                            # if row-1 is negative then the column spot in question is at the bottom and it's available
+                            else:
+                                goodColumns.append(col+3)
+        # always return goodColumns array and set good_columns back to goodColumns
+        self.good_columns = goodColumns
+        return goodColumns
     
-    # check cols starts at col 1 row 1, then searches col 2 row 1, col 3 row 1, and col 4 row 1
+    # ai check for almost matching columns (3 in a column)
+    # this will always be fine it seems
+    def ai_check_almost_matching_columns(self):
+        board = self.connect_four_board
+        # store good columns to choose from. keep duplicates as increasing odds of choosing a column in the end is intended
+        goodColumns = self.good_columns
+        for col in range(7):
+            for row in range(3):
+                # this can be aggressive or defensive since it's searching for non-empty string
+                if board[col][row] != '' and board[col][row+1] == board[col][row] and board[col][row+2] == board[col][row]:
+                    # check for empty spot in column
+                    if board[col][row+3] == '':
+                        goodColumns.append(col)
+        # always return goodColumns array and set good_columns back to goodColumns
+        self.good_columns = goodColumns
+        return goodColumns
+    
+    # these matching diagonal AI's may be off for the negative checks, but seems good to me at a glance
+    #TODO check again
+
+    # ai check for almost matching positive diagonal (3 in a positive diagonal)
+    def ai_check_almost_matching_positive_diagonal(self):
+        board = self.connect_four_board
+        # store good columns to choose from. keep duplicates as increasing odds of choosing a column in the end is intended
+        goodColumns = self.good_columns
+        for col in range(4):
+            for row in range(3):
+                if board[col][row] != '' and board[col+1][row+1] == board[col][row] and board[col+2][row+2] == board[col][row]:
+                    # check for empty column up and right
+                    if board[col+3][row+3] == '':
+                        # special checking if there's a piece under the good spot to place
+                            if row+2 >= 0:
+                                if board[col+3][row+2] != '':        
+                                    goodColumns.append(col+3)
+                            # if row-1 is negative then the column spot in question is at the bottom and it's available
+                            else:
+                                goodColumns.append(col+3)
+                    # check for empty column down and left, both col and row there must exist
+                    if col-1 >= 0 and row-1 >= 0:
+                        if board[col-1][row-1] == '':
+                            if row-2 >= 0:
+                                if board[col-1][row-2] != '':        
+                                    goodColumns.append(col-1)
+                            # if row-2 is negative then the column spot in question is at the bottom and it's available
+                            else:
+                                goodColumns.append(col-1)
+        # always return goodColumns array and set good_columns back to goodColumns
+        self.good_columns = goodColumns
+        return goodColumns
+    
+    # ai check for almost matching negative diagonal (3 in a negative diagonal)
+    def ai_check_almost_matching_negative_diagonal(self):
+        board = self.connect_four_board
+        # store good columns to choose from. keep duplicates as increasing odds of choosing a column in the end is intended
+        goodColumns = self.good_columns
+        for col in range(4):
+            for row in range(3, 6):
+                if board[col][row] != '' and board[col+1][row-1] == board[col][row] and board[col+2][row-2] == board[col][row]:
+                    # check for empty column right and down
+                    if board[col+3][row-3] == '':
+                        # special checking if there's a piece under the good spot to place
+                            if row-4 >= 0:
+                                if board[col+3][row-4] != '':        
+                                    goodColumns.append(col+3)
+                            # if row-1 is negative then the column spot in question is at the bottom and it's available
+                            else:
+                                goodColumns.append(col+3)
+                    # check for empty column left and up, both col and row there must exist
+                    if col-1 >= 0 and row+1 >= 0:
+                        if row >= 0:
+                            if board[col-1][row] != '':
+                                goodColumns.append(col-1)
+                            # if row-2 is negative then the column spot in question is at the bottom and it's available
+                            else:
+                                goodColumns.append(col-1)
+        # always return goodColumns array and set good_columns back to goodColumns
+        self.good_columns = goodColumns
+        return goodColumns
+
+    # choose a random column based on AI results 
+    # (it searches for matches of 3 - 
+    # it could be better by searching for something like red-red-empty-red but it is intended to search for red-red-red-empty in all directions, if written right)
+    def ai_choose_column(self):
+        self.ai_check_almost_matching_columns()
+        self.ai_check_almost_matching_negative_diagonal()
+        self.ai_check_almost_matching_positive_diagonal()
+        self.ai_check_almost_matching_rows()
+        goodColumns = self.good_columns
+        print('good columns: ' + str(goodColumns))
+        # reset good_columns to empty
+        self.good_columns = []
+        # randomize based on goodColumns
+        if len(goodColumns) > 0:
+            # add 1 since the goodColumns are based on index
+            return random.choice(goodColumns)+1
+        # else choose random from open columns
+        else:
+            return self.choose_column()
+    
+    # check rows starts at col 1 row 1, then searches col 2 row 1, col 3 row 1, and col 4 row 1
     # have col be limited by 6-3 because beyond col 7 does not exist, and you add up to 3 for col
-    def check_matching_columns(self):
+    def check_matching_rows(self):
         board = self.connect_four_board
         for col in range(4):
             for row in range(6):
@@ -89,9 +232,9 @@ class BoardToClient:
                     return board[col][row]
         return ''
     
-    # check rows starts at col 1 row 1, then searches col 1 row 2, col 1 row 3, and col 1 row 4
+    # check cols starts at col 1 row 1, then searches col 1 row 2, col 1 row 3, and col 1 row 4
     # have row be limited by 6-3 because beyond row 6 does not exist, and you add up to 3 for row
-    def check_matching_rows(self):
+    def check_matching_columns(self):
         board = self.connect_four_board
         for col in range(7):
             for row in range(3):
@@ -128,7 +271,8 @@ class BoardToClient:
         return ''
     
     def construct_message(self, msg, color, id):
-        col = self.choose_column()
+        #col = self.ai_choose_column()
+        col = self.ai_choose_column()
         self.insert_to_board(col, color)
         #print('tie result: ' + str(tie))
         res = 'n'
