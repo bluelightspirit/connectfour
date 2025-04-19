@@ -388,6 +388,11 @@ class TwistedServerApp(App):
                 boardGiven = self.find_board(idGiven)
                 boardGiven.cols_enabled.remove(int(x[4:5]))
                 print('cols enabled: ' + str(boardGiven.cols_enabled))
+                if boardGiven.determine_tie() == True:
+                    msg = f't|{idGivenStr}'
+                    print('connect 4 board: ' + str(boardGiven.connect_four_board))
+                    self.label.text += "responded: {}\n".format(msg)
+                    return msg.encode('utf-8')
                 #print("receive dis successful")
         for x in msg_array:
             # case of receiving a color
