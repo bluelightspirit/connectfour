@@ -1,0 +1,8 @@
+example files referenced:
+calculator.py - https://blog.kivy.org/2019/12/kivy-tutorial-003-building-a-full-gui/ 
+	with https://blog.kivy.org/2019/12/kivy-tutorial-004-making-the-gui-do-stuff-binding-to-events/
+echo_client_app.py - https://github.com/kivy/kivy/blob/master/examples/frameworks/twisted/echo_client_app.py
+echo_server_app.py - https://github.com/kivy/kivy/blob/master/examples/frameworks/twisted/echo_server_app.py
+pango_demo.py - https://github.com/kivy/kivy/blob/master/examples/text/pango_demo.py
+main.py and pong.kv - https://github.com/kivy/kivy/tree/master/examples/tutorials/pong
+myPaint.py - https://kivy.org/doc/stable/tutorials/firstwidget.html
