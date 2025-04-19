@@ -22,6 +22,8 @@ from kivy.uix.textinput import TextInput
 from kivy.graphics import Color, Rectangle
 from kivy.clock import Clock
 
+opacity = NumericProperty(1)
+
 class PieceGridLayout(GridLayout):
     pass
 
@@ -65,6 +67,8 @@ class ColumnButton(Button):
     pass
 
 class Red(Image):
+    def on_opacity(*args):
+        Image.color = [1,1,1,App.opacity]
     pass
 
 class Yellow(Image):
@@ -151,6 +155,7 @@ class CalculatormodifiedApp(App):
     id = -1
     global id_found
     id_found = False
+    opacity = NumericProperty(1)
 
     # https://kivy.org/doc/stable/api-kivy.uix.label.html
 
@@ -361,6 +366,7 @@ class CalculatormodifiedApp(App):
             return
         if msg[0:1] == "t" and msg.count('|') == 1:
             if int(msg[2:]) == id:
+                self.opacity = 0.5
                 result = "tie"
                 result_found = True
                 self.send_disconnect_message()
@@ -372,6 +378,7 @@ class CalculatormodifiedApp(App):
                 return
         if msg[0:1] == "w" and msg.count('|') == 1:
             if int(msg[2:]) == id:
+                self.opacity = 0.5
                 result = "win"
                 result_found = True
                 self.client_win = True
@@ -384,6 +391,7 @@ class CalculatormodifiedApp(App):
                 return
         if msg[0:1] == "l" and msg.count('|') == 1:
             if int(msg[2:]) == id:
+                self.opacity = 0.5
                 result = "lose"
                 result_found = True
                 self.server_win = True
@@ -411,6 +419,7 @@ class CalculatormodifiedApp(App):
             case 7:
                 button_seven.add_color(column_seven,7,False)
         if msg[0:1] == "t" and int(msg[8:]) == id:
+            self.opacity = 0.5
             result = "tie"
             result_found = True
             self.send_disconnect_message()
@@ -419,6 +428,7 @@ class CalculatormodifiedApp(App):
             print(result)
             return result
         if msg[0:1] == "w" and int(msg[8:]) == id:
+            self.opacity = 0.5
             result = "win"
             result_found = True
             self.client_win = True
@@ -428,6 +438,7 @@ class CalculatormodifiedApp(App):
             print(result)
             return result
         if msg[0:1] == "l" and int(msg[8:]) == id:
+            self.opacity = 0.5
             result = "lose"
             result_found = True
             self.server_win = True
