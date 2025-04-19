@@ -95,7 +95,7 @@ class BoardToClient:
         board = self.connect_four_board
         # store good columns to choose from. keep duplicates as increasing odds of choosing a column in the end is intended
         goodColumns = self.good_columns
-        for col in range(4):
+        for col in range(5):
             for row in range(6):
                 # this can be aggressive or defensive since it's seraching for non-empty string.
                 if board[col][row] != '' and board[col+1][row] == board[col][row] and board[col+2][row] == board[col][row]:
@@ -111,7 +111,7 @@ class BoardToClient:
                             else:
                                 goodColumns.append(col-1)
                     # check for empty column right
-                    if board[col+3][row] == '':
+                    if col+3 <=6 and board[col+3][row] == '':
                         # special checking if there's a piece under the good spot to place
                             if row-1 >= 0:
                                 if board[col+3][row-1] != '':        
@@ -148,13 +148,13 @@ class BoardToClient:
         board = self.connect_four_board
         # store good columns to choose from. keep duplicates as increasing odds of choosing a column in the end is intended
         goodColumns = self.good_columns
-        for col in range(4):
-            for row in range(3):
+        for col in range(5):
+            for row in range(4):
                 if board[col][row] != '' and board[col+1][row+1] == board[col][row] and board[col+2][row+2] == board[col][row]:
                     # check for empty column up and right
-                    if board[col+3][row+3] == '':
+                    if col+3 <= 6 and row+3 <= 5 and board[col+3][row+3] == '':
                         # special checking if there's a piece under the good spot to place
-                            if row+2 >= 0:
+                            if row+2 <= 5:
                                 if board[col+3][row+2] != '':        
                                     goodColumns.append(col+3)
                             # if row-1 is negative then the column spot in question is at the bottom and it's available
@@ -178,11 +178,11 @@ class BoardToClient:
         board = self.connect_four_board
         # store good columns to choose from. keep duplicates as increasing odds of choosing a column in the end is intended
         goodColumns = self.good_columns
-        for col in range(4):
-            for row in range(3, 6):
+        for col in range(5):
+            for row in range(2, 6):
                 if board[col][row] != '' and board[col+1][row-1] == board[col][row] and board[col+2][row-2] == board[col][row]:
                     # check for empty column right and down
-                    if board[col+3][row-3] == '':
+                    if col+3 <= 6 and row-3 >= 0 and board[col+3][row-3] == '':
                         # special checking if there's a piece under the good spot to place
                             if row-4 >= 0:
                                 if board[col+3][row-4] != '':        
@@ -191,7 +191,7 @@ class BoardToClient:
                             else:
                                 goodColumns.append(col+3)
                     # check for empty column left and up, both col and row there must exist
-                    if col-1 >= 0 and row+1 >= 0:
+                    if col-1 >= 0 and row+1 <= 5:
                         if row >= 0:
                             if board[col-1][row] != '':
                                 goodColumns.append(col-1)
@@ -202,6 +202,25 @@ class BoardToClient:
         self.good_columns = goodColumns
         return goodColumns
 
+    def remove_disabled_columns_from_good_columns(self):
+        goodColumns = self.good_columns
+        values_to_remove = []
+        # adjust cols enabled to be indexed
+        indexed_cols_enabled = []
+        for x in self.cols_enabled:
+            indexed_cols_enabled.append(x-1)
+        print(indexed_cols_enabled)
+        print(self.cols_enabled)
+        # get values to remove
+        for x in goodColumns:
+            if x not in indexed_cols_enabled:
+                values_to_remove.append(x)
+        print('removing from good_columns: ' + str(values_to_remove))
+        # remove those values
+        for x in values_to_remove:
+            goodColumns.remove(x)
+        self.good_columns = goodColumns
+
     # choose a random column based on AI results 
     # (it searches for matches of 3 - 
     # it could be better by searching for something like red-red-empty-red but it is intended to search for red-red-red-empty in all directions, if written right)
@@ -210,17 +229,21 @@ class BoardToClient:
         self.ai_check_almost_matching_negative_diagonal()
         self.ai_check_almost_matching_positive_diagonal()
         self.ai_check_almost_matching_rows()
+        self.remove_disabled_columns_from_good_columns()
         goodColumns = self.good_columns
-        print('good columns: ' + str(goodColumns))
-        # reset good_columns to empty
-        self.good_columns = []
+        randomNumber = -1
+        print('good columns (by index, so +1 for actual column): ' + str(goodColumns))
         # randomize based on goodColumns
         if len(goodColumns) > 0:
             # add 1 since the goodColumns are based on index
-            return random.choice(goodColumns)+1
+            randomNumber = random.choice(goodColumns)+1
         # else choose random from open columns
         else:
-            return self.choose_column()
+            randomNumber = self.choose_column()
+        # reset good_columns to empty
+        self.good_columns.clear()
+        # return random result
+        return randomNumber
     
     # check rows starts at col 1 row 1, then searches col 2 row 1, col 3 row 1, and col 4 row 1
     # have col be limited by 6-3 because beyond col 7 does not exist, and you add up to 3 for col
@@ -304,7 +327,7 @@ class TwistedServerApp(App):
         msg = msg.decode('utf-8')
         self.label.text = "received:  {}\n".format(msg)
         msg_array = msg.split("\n")
-        msg = ''
+        # msg = ''
         id = None
         for x in msg_array:
             if x == '':
@@ -314,7 +337,7 @@ class TwistedServerApp(App):
                 return self.handle_message_before_id_setup(id)
             elif x != '':
                 print('MSG: ' + x)
-                return self.handle_message_after_id_setup(x)
+                return self.handle_message_after_id_setup(msg)
         
     def find_board(self, id):
         for board in self.boards:
