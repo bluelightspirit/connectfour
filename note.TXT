@@ -1,0 +1,6 @@
+requirements.txt is for Linux
+	some testing was done in Linux just fine
+requirements_windows.txt is for Windows
+	this program was extensively tested in Windows the most, but kivy is cross-platform it claims
+if you're on mac honestly you could likely get away with just doing pip install Kivy then pip install Twister
+	but we are not mac users to test that
