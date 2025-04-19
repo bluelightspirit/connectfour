@@ -1,3 +1,11 @@
+# -----------------------------------------------------------------------------------------------------------------------------------
+# names: gary young, colin chu
+# program name (official): calculatormodified.py
+# program name (unofficial): connectfour, on the clients end
+# purpose of the program: to play connect four with the server as a client, using a kivy GUI
+# We pledge
+# -----------------------------------------------------------------------------------------------------------------------------------
+
 # install_twisted_rector must be called before importing the reactor
 from __future__ import unicode_literals
 
@@ -8,7 +16,7 @@ install_twisted_reactor()
 # A Simple Client that send messages to the Echo Server
 from twisted.internet import reactor, protocol
 
-import time
+#import time
 from kivy.app import App 
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
@@ -376,6 +384,7 @@ class CalculatormodifiedApp(App):
         global result
         global result_found
         global id
+        # TODO ask professor about this
         # if the first 3 chars indicate server is responding with an id message, have handle_message_for_receiving_id() handle it
         # note: for multi-connection for clients and the server to work, clients should ideally NEVER connect at the same exact time as then they would possibly both receive the same id
         # even in that case, this still satisfies the extra credit requirement anyway if that happens - just both clients would be playing the same board and >= 1 of the clients would have issues receiving the other clients data as the server is setup to also send results

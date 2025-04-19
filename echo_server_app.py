@@ -1,3 +1,11 @@
+# -----------------------------------------------------------------------------------------------------------------------------------
+# names: gary young, colin chu
+# program name (official): echo_server_app.py
+# program name (unofficial): connectfour, on the servers end
+# purpose of the program: to play connect four with clients, using AI to choose columns to send back to clients
+# We pledge
+# -----------------------------------------------------------------------------------------------------------------------------------
+
 # install_twisted_rector must be called before importing and using the reactor
 from kivy.support import install_twisted_reactor
 
