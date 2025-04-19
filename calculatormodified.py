@@ -168,6 +168,8 @@ class CalculatormodifiedApp(App):
     global id_found
     id_found = False
     # this is used to change opacity of the red/yellow pieces
+    # kivy NumericProperty use: https://www.youtube.com/watch?v=OkW-1uzP5Og
+    # see the video author is a official Kivy author: https://blog.kivy.org/author/alexander-taylor/
     opacity = NumericProperty(1)
 
     # https://kivy.org/doc/stable/api-kivy.uix.label.html
