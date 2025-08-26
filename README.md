@@ -6,4 +6,4 @@ The command pip -r install requirements.txt should work for most Linux and Mac. 
 Kivy should also work on mobile. However, this was not tested on mobile platforms yet.
 
 ## Compiling
-This program uses solely Python and Kivy to compile.
+This program uses solely Python and kvlang to compile.
